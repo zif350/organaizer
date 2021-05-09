@@ -1,2 +1,2 @@
 # organaizer
-create organaiser
+create organaizer
