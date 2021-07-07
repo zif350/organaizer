@@ -1,0 +1,113 @@
+*{box-sizing: border-box}
+
+body {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    height: auto;
+    border: 1px solid;
+    padding: 10px
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    margin-top: 
+}
+
+ul li {
+    cursor: pointer;
+    position: relative;
+    padding: 12px 8px 12px 40px;
+    list-style-type: none;
+    background: #ffffff;
+    font-size: 18px;
+    transition: 0.2s;
+}
+
+ul li:hover {
+    background: #ddd;
+}
+
+ul li.checked {
+    background: #ce7777;
+    color: #5c5c5c;
+}
+
+ul li.checked::before {
+    content: '';
+    position: absolute;
+    border-color: #fff;
+    border-style: solid;
+    border-width: 0 2px 2px 0;
+    top: 10px;
+    left: 16px;
+    transform: rotate(45deg);
+    height: 15px;
+    width: 7px;
+}
+
+.signOut {
+    text-align: right
+}
+
+a {
+    color: #0031ff;
+}
+
+.addTask {
+    text-align: right;
+}
+
+#addTaskBtn {
+    background-color: #4da8f5;
+    border: none;
+    margin: 20px;
+    padding: 10px;
+    color: white;
+}
+
+#addTaskBtn:hover {
+    background-color: #0388c3;
+}
+
+input {
+    margin: 5px;
+    background-color: aliceblue
+}
+
+input:hover {
+    background-color: #e6e6e6
+}
+
+#formToCreateTask {
+    background-color: #a3d5ff;
+    display: none;
+}
+
+span {
+    font-size: 12px;
+}
+
+.delete {
+    position: absolute;
+    right: 0px;
+    font-size: 34px;
+    margin-top: -16px;
+    color: #720000;
+    width: 40px;
+    text-align: center;
+}
+
+.delete:hover {
+    background-color: #ff5c36
+}
+
+.haveId {
+    display: none;
+    transition: 0.2s
+}
+
+#inputDate {
+    display: none
+}

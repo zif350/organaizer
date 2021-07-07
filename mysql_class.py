@@ -18,9 +18,10 @@ class MySQL:
         query = f"insert into {table} values {values}"
         self.execute(query=query)
 
-    def update_data(self, table, condition, **kwargs):
-        set_values = ", ".join([f"{k} = '{v}'" for k, v in kwargs.items()])
+    def update_task_complete(self, table, condition, cl):
+        set_values = f"complete={cl}"
         query = f"update {table} set {set_values} where {condition}"
+        print(f"update_task_complete: {query}")
         self.execute(query=query)
 
     def select_data(self, table, condition="1=1", take="*"):
@@ -39,10 +40,10 @@ class MySQL:
     def create_tasks_table(self, table_name):
         query = f"create table `{table_name}`(" \
                 f"`ID` int auto_increment," \
-                f"`date` date not null," \
+                f"`date` varchar(40) not null," \
                 f"`shortName` varchar(40) not null," \
                 f"`description` TINYTEXT default null," \
-                f"`complete` int default 0," \
+                f"`complete` varchar(10) default ''," \
                 f"PRIMARY KEY (`ID`)" \
                 f") ENGINE=InnoDB DEFAULT CHARSET=utf8;"
         self.execute(query)

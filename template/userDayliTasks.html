@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="static/css/userDayliTasks.css">
+    <title>Tasks</title>
+</head>
+<body>
+    <form class="signOut" action="sign_out" method="post">
+        <button type="submit">Sign out</button>
+    </form>
+    <form method="post" action="change_date">
+        <label for="name">Join date:</label>
+        <input type="date" id="myDate" name="join_date" onchange="this.form.submit()" value="{{date}}">
+    </form>
+    <ul id="myUL">
+        {% for task in tasks_data %}
+        <li id=" {{task.id}} " class="{{task.complete}}">{{task.short_name}}&#160&#160<span>{{task.description}}</span>
+            <form method="post" action="delete_task" class="delete">
+                <input name="task_id" class="haveId" value="{{task.id}}">
+                <button type="submit" class="delete">×</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+    <div id="taskCreation">
+        <form id="formToCreateTask" action="add_task" method="post">
+            <input type="date" id="inputDate" name="join_date" value="{{date}}">
+            <input type="text" id="shortName" name="short_name" placeholder="Short name" required>
+            <input type="text" id="description" name="description" placeholder="Description" required>
+            <button type="submit" onclick="createTask()">Create</button>
+            <input type="button" value="Cancel" onclick="removeForm()">
+        </form>
+    </div>
+       <div class="addTask"><button id="addTaskBtn" onclick="showFormToTask()">Add task</button></div>
+    <script>
+        var form = document.getElementById("formToCreateTask");
+        var tasks = document.getElementsByTagName("li");
+
+        function showFormToTask() {
+            form.style.display = "block";
+        }
+
+        document.addEventListener("click", function(e) {
+            if (e.target.tagName == "LI") {
+                console.log(e.target)
+                let formData = new FormData(document.forms.person);
+                formData.append("task_id", e.target.id);
+                let xhr = new XMLHttpRequest();
+                xhr.open("POST", "/update_task");
+                xhr.send(formData);
+                location.reload()
+
+            } else if (e.target.parentElement.tagName == "LI") {
+                console.log(e.target)
+            }
+
+        })
+
+    </script>
+</body>
+</html>

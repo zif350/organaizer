@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form action="ttt" id="form">
+        <input type="text" name="some_inf">
+        <input type="submit">
+    </form>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(function(){
+    $("#form").onsubmit(function(){
+        // Преобразуем форму в массив
+        var form_data = $("#form").serializeArray;
+
+        $.ajax({
+            type: 'POST', // Делаем POST запрос
+            data: form_data
+        });
+    });
+});
+</script>
+</html>

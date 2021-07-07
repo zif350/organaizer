@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="static/css/registration.css">
+    <title>Registration</title>
+</head>
+<body>
+    <form method="post" action="user_registration">
+      <div class="container">
+        <h1>Register</h1>
+        <hr id="first">
+
+        <label for="name"><b>Name</b></label>
+        <input type="text" placeholder="Name" name="name" required>
+        <hr>
+
+
+          <label for="psw"><b>Password</b></label>
+        <input type="password" id="psw" placeholder="Password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required>
+        <hr>
+
+        <label for="psw-repeat"><b>Repeat Password</b></label>
+        <input type="password" id="psw-repeat" placeholder="Repeat Password" name="password_repeat" required>
+        <div id="message">
+        Different password!
+        </div>
+        <hr>
+
+         <button type="submit" id="registerBtn">Register</button>
+      </div>
+
+      <div class="signIn">
+        <p>Already have an account? <a href="index">Sign in</a>.</p>
+      </div>
+    </form>
+    
+    <script>
+        var inputPassword = document.getElementById("psw");
+        var inputRepeatPassword = document.getElementById("psw-repeat");
+        var message = document.getElementById("message");
+        var registerButton = document.getElementById("registerBtn");
+        inputRepeatPassword.onkeyup = function() {
+            if (inputPassword.value != inputRepeatPassword.value){
+                message.style.opacity =1;
+                registerButton.disabled = true;
+            }
+            else {
+                message.style.opacity = 0;
+                registerButton.disabled = false;
+            }
+        }
+        
+        inputPassword.onkeyup = function() {
+            if (inputPassword.value != inputRepeatPassword.value){
+                message.style.opacity =1;
+                registerButton.disabled = true;
+            }
+            else {
+                message.style.opacity = 0;
+                registerButton.disabled = false;
+            }
+        }
+        
+        
+    </script>
+</body>
+</html>

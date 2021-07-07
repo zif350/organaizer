@@ -1,18 +1,29 @@
 from mysql_class import MySQL
-from task_class import Task
+
+
+class NameTooLong(Exception):
+    pass
+
+
+class PasswordTooShort(Exception):
+    pass
 
 
 class User:
 
     TABLE_NAME = "users"
     DATABASE_NAME = "main"
-    def __init__(self, name, password):
-        self._name = name
-        self._password = password
+
+    def __init__(self, name, password, registration=False):
+        self.name = name
+        self.password = password
         self._task_table = self._name + "tasks"
         self._db = MySQL(database_name=User.DATABASE_NAME)
-        self.__add_user_in_database()
-        self._db.create_tasks_table(table_name=self._task_table)
+        if registration:
+            self.__add_user_in_database()
+            self._db.create_tasks_table(table_name=self._task_table)
+        # else:
+        #     self.user_verification()
 
     @property
     def name(self):
@@ -20,6 +31,8 @@ class User:
 
     @name.setter
     def name(self, val):
+        if len(val) > 45:
+            raise NameTooLong(val)
         self._name = val
 
     @property
@@ -28,6 +41,8 @@ class User:
 
     @password.setter
     def password(self, val):
+        if len(val) < 8:
+            raise PasswordTooShort(val)
         self._password = val
 
     def __add_user_in_database(self):
@@ -37,20 +52,26 @@ class User:
     def select_some_task(self, condition="1=1"):
         return self._db.select_data(table=self._task_table, condition=condition)
 
-    def add_task(self, task):
-        task.add_task_in_table()
+    def turning_task_in_json(self, date):
+        tasks = self.select_some_task(condition=f"date='{date}'")
+        keys = ["id", "date", "short_name", "description", "complete"]
+        json_data = []
+        for task in tasks:
+            json_data.append(dict(zip(keys, task)))
+        return json_data
 
-    def delete_task(self, task):
-        task.delete_task()
+    @classmethod
+    def return_names_and_passwords(cls):
+        database = MySQL(cls.DATABASE_NAME)
+        users = database.select_data(table=cls.TABLE_NAME, take="name, password")
+        keys = ["name", "password"]
+        users_dict = []
+        for user in users:
+            users_dict.append(dict(zip(keys, user)))
+        return users_dict
+
 
     def delete_user(self):
         condition = f"name='{self._name}'"
         self._db.drop_table(table_name=self._task_table)
         self._db.delete(table_name="users", condition=condition)
-
-if __name__ == '__main__':
-    person1 = User(name="yasha12", password="1234")
-    task = Task(date="1984-11-12", short_name="test functionality", description="dadfasdfa", task_table_name=person1._task_table)
-    print(person1.select_some_task())
-    person1.delete_user()
-
