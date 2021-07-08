@@ -56,3 +56,9 @@ a {
     background-color: #ffffff;
     text-align: center;
 }
+
+.message {
+    color: red;
+    font-size: 70%;
+    margin-top: -15px
+}

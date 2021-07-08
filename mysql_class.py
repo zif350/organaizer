@@ -1,16 +1,24 @@
 import mysql.connector
+import logging
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 class MySQL:
     def __init__(self, database_name):
+        LOGGER.info("Creating MySQL database")
         self.connection = mysql.connector.connect(
             user="root", password="secret",
             autocommit=True, port=3306,
             database=database_name)
+        LOGGER.info(f"MySQL database {database_name} created")
 
     def execute(self, query, select=False):
+        LOGGER.debug(f"sending query: {query}")
         with self.connection.cursor() as cursor:
             cursor.execute(query)
+            LOGGER.debug(f"query accepted: {query}")
             if select:
                 return cursor.fetchall()
 

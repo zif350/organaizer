@@ -5,6 +5,11 @@ from user_class import User
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from datetime import datetime
 from task_class import Task
+import logging
+import sys
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 env = Environment(
@@ -16,16 +21,18 @@ env = Environment(
 class MyWebServices:
 
     @cherrypy.expose()
-    def index(self):
-        return open("template/signIn.html")
+    def index(self, message="", name="", password=""):
+        template = env.get_template("signIn.html")
+        return template.render(message=message, name=name, password=password)
 
     @cherrypy.expose()
     def user_sign_in(self, name, password):
         return self.user_verification(create=False, name=name, password=password)
 
     @cherrypy.expose()
-    def registration_html(self):
-        return open("template/registration.html")
+    def registration_html(self,  message="", name="", password=""):
+        template = env.get_template("registration.html")
+        return template.render(message=message, name=name, password=password)
 
     @cherrypy.expose()
     def user_registration(self, name, password, password_repeat):
@@ -38,10 +45,12 @@ class MyWebServices:
         template = env.get_template('userDayliTasks.html')
         tasks = cherrypy.session["person"].turning_task_in_json(date)
         cherrypy.session["date"] = date
+        LOGGER.debug(f"user {cherrypy.session['person']._name} on date {date}")
         return template.render(date=date, tasks_data=tasks)
 
     @cherrypy.expose()
     def change_date(self, join_date):
+        LOGGER.debug(f"selected day: {join_date}")
         cherrypy.session["date"] = join_date
         raise cherrypy.HTTPRedirect("/updated_page")
 
@@ -49,47 +58,59 @@ class MyWebServices:
     def user_verification(self, create, name, password):
         users_list = User.return_names_and_passwords()
         if create:
+            LOGGER.info("creating user")
             for user in users_list:
                 if user["name"] == name:
-                    return self.registration_html()
+                    LOGGER.info(f"user with name '{name}' already exists")
+                    return self.registration_html(message="user with this name already exists",
+                                                  name=name, password=password)
             person = User(name=name, password=password, registration=True)
             cherrypy.session["person"] = person
+            LOGGER.info(f"user {name} created")
             return self.user_daily_tasks()
         else:
             for user in users_list:
                 if user["name"] == name and user["password"] == password:
                     person = User(name=name, password=password, registration=False)
                     cherrypy.session["person"] = person
+                    LOGGER.info(f"user {name} sign in")
                     return self.user_daily_tasks()
-            return self.index()
+            LOGGER.info(f"incorrect password({password}) or username({name})")
+            return self.index(message="incorrect password or user name", name=name, password=password)
 
     @cherrypy.expose()
     def sign_out(self):
+        LOGGER.debug(f"user {cherrypy.session['person']._name} sign out")
         cherrypy.session["person"] = None
         cherrypy.session["date"] = None
         return self.index()
 
     @cherrypy.expose()
     def add_task(self, join_date, short_name, description):
+        LOGGER.info(f"user {cherrypy.session['person']._name} creating task")
         Task(date=join_date, short_name=short_name, description=description,
              task_table_name=cherrypy.session["person"]._task_table)
+        LOGGER.info("task created")
         raise cherrypy.HTTPRedirect("/updated_page")
 
     @cherrypy.expose()
     def updated_page(self):
+        LOGGER.debug("update page")
         return self.user_daily_tasks(cherrypy.session["date"])
 
     @cherrypy.expose()
     def delete_task(self, task_id):
+        LOGGER.info(f"deleting task with id: {task_id}")
         condition = f"id={task_id}"
         cherrypy.session["person"]._db.delete(table_name=cherrypy.session["person"]._task_table, condition=condition)
+        LOGGER.info(f"task with id: {task_id} deleted")
         raise cherrypy.HTTPRedirect("/updated_page")
 
     @cherrypy.expose()
     def update_task(self, task_id):
         complete = cherrypy.session["person"]._db.select_data(take="complete",
                                     table=cherrypy.session["person"]._task_table, condition=f"id='{task_id.strip()}'")
-        print(f"update_task: {complete}")
+        LOGGER.debug(f"updating task(id: {task_id}): {complete}")
         if complete[0][0] == "":
             cherrypy.session["person"]._db.update_task_complete(table=cherrypy.session["person"]._task_table,
                                                                 condition=f"id='{task_id.strip()}'", cl="'checked'")
@@ -100,6 +121,7 @@ class MyWebServices:
 
 
 def main():
+    LOGGER.debug("update cherrypy config")
     conf = {
         '/': {
             'tools.sessions.on': True,
@@ -111,11 +133,26 @@ def main():
         }
     }
     cherrypy.config.update({"server.socket_port": 8097})
+    LOGGER.debug("starting application")
     cherrypy.quickstart(MyWebServices(), '/', conf)
 
 
+def setup_logging(log_level=logging.DEBUG):
+    file_handler = logging.FileHandler("application.log")
+    formatter = logging.Formatter("[%(asctime)s] - %(levelname)s - %(module)s : %(message)s")
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(log_level)
+    root_logger = logging.getLogger()
+    root_logger.addHandler(file_handler)
+    root_logger.setLevel(log_level)
+    stdout_handler = logging.StreamHandler(stream=sys.stdout)
+    stdout_handler.setFormatter(formatter)
+    stdout_handler.setLevel(log_level)
+
+
 if __name__ == '__main__':
+    setup_logging()
     try:
         main()
     except Exception as ex:
-        print("critical")
+        logging.critical(f"CRITICAL! Application failed, details: {ex}")

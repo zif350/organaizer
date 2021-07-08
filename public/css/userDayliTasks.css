@@ -18,11 +18,12 @@ ul {
 ul li {
     cursor: pointer;
     position: relative;
-    padding: 12px 8px 12px 40px;
+    padding: 12px 9px 12px 40px;
     list-style-type: none;
     background: #ffffff;
     font-size: 18px;
     transition: 0.2s;
+    margin-bottom: 2px
 }
 
 ul li:hover {
@@ -31,7 +32,7 @@ ul li:hover {
 
 ul li.checked {
     background: #ce7777;
-    color: #5c5c5c;
+    color: white;
 }
 
 ul li.checked::before {
@@ -93,10 +94,11 @@ span {
     position: absolute;
     right: 0px;
     font-size: 34px;
-    margin-top: -16px;
+    margin-top: -12px;
     color: #720000;
     width: 40px;
     text-align: center;
+    height: 45px
 }
 
 .delete:hover {
@@ -110,4 +112,16 @@ span {
 
 #inputDate {
     display: none
+}
+
+#description {
+    width: 400px
+}
+
+#formToCreateTask button {
+    margin-left: 5px;
+}
+
+li span {
+    max-width: 56px
 }

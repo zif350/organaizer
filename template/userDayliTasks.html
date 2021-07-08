@@ -16,18 +16,15 @@
     <ul id="myUL">
         {% for task in tasks_data %}
         <li id=" {{task.id}} " class="{{task.complete}}">{{task.short_name}}&#160&#160<span>{{task.description}}</span>
-            <form method="post" action="delete_task" class="delete">
-                <input name="task_id" class="haveId" value="{{task.id}}">
-                <button type="submit" class="delete">×</button>
-            </form>
+            <button type="submit" class="delete" onclick="deleteTask(this)">×</button>
         </li>
         {% endfor %}
     </ul>
     <div id="taskCreation">
         <form id="formToCreateTask" action="add_task" method="post">
             <input type="date" id="inputDate" name="join_date" value="{{date}}">
-            <input type="text" id="shortName" name="short_name" placeholder="Short name" required>
-            <input type="text" id="description" name="description" placeholder="Description" required>
+            <input type="text" id="shortName" maxlength="25" name="short_name" placeholder="Short name" required>
+            <input type="text" id="description" name="description" maxlength="70" placeholder="Description" required>
             <button type="submit" onclick="createTask()">Create</button>
             <input type="button" value="Cancel" onclick="removeForm()">
         </form>
@@ -49,14 +46,30 @@
                 let xhr = new XMLHttpRequest();
                 xhr.open("POST", "/update_task");
                 xhr.send(formData);
-                location.reload()
-
+                e.target.classList.toggle("checked")
             } else if (e.target.parentElement.tagName == "LI") {
-                console.log(e.target)
+                let formData = new FormData(document.forms.person);
+                formData.append("task_id", e.target.parentElement.id);
+                let xhr = new XMLHttpRequest();
+                xhr.open("POST", "/update_task");
+                xhr.send(formData);
+                e.target.parentElement.classList.toggle("checked")
             }
 
         })
 
+        function deleteTask(e) {
+            let formData = new FormData(document.forms.person);
+            formData.append("task_id", e.parentElement.id);
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "/delete_task");
+            xhr.send(formData);
+            e.parentElement.remove()
+        }
+
+        function removeForm() {
+            form.style.display = "none"
+        }
     </script>
 </body>
 </html>
