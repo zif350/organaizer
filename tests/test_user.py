@@ -46,8 +46,24 @@ def test_turning_task_in_json(new_user, tasks):
     expected_json_data = [{"id": 1, "date": tasks[0].date, "short_name": tasks[0].short_name,
                       "description": tasks[0].description, "complete": tasks[0].complete},
                      {"id": 2, "date": tasks[1].date, "short_name": tasks[1].short_name,
-                      "description": tasks[1].description, "complete": tasks[1].complete}
+                      "description": tasks[1].description, "complete": tasks[1].complete},
                      ]
     json_data = new_user.turning_task_in_json(date=tasks[0].date)
-    assert json_data == expected_json_data
+    assert expected_json_data == json_data
     new_user.delete_user()
+
+
+def test_select_some_task(new_user, tasks):
+    expected_data = [(1, tasks[0].date, tasks[0].short_name, tasks[0].description, tasks[0].complete),
+                     (2, tasks[1].date, tasks[1].short_name, tasks[1].description, tasks[1].complete),]
+    data = new_user.select_some_task()
+    assert expected_data == data
+    new_user.delete_user()
+
+
+def test_delete_user(new_user):
+    name = new_user.name
+    db = new_user._db
+    new_user.delete_user()
+    selected_deleted_user = db.select_data(table=new_user.TABLE_NAME, condition=f"name='{name}'")
+    assert [] == selected_deleted_user
