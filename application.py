@@ -6,13 +6,11 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from datetime import datetime
 from task_class import Task
 import logging
+from logging.handlers import RotatingFileHandler
 import sys
 
 
 LOGGER = logging.getLogger(__name__)
-
-
-
 
 
 class MyWebServices:
@@ -140,16 +138,19 @@ def main(template_loader_path="./template", static_dir="./public", port=8098):
 
 
 def setup_logging(log_level=logging.DEBUG):
-    file_handler = logging.FileHandler("application.log")
+    # file handler
+    file_handler = logging.handlers.RotatingFileHandler(filename="application.log", maxBytes=2**30, backupCount=2)
     formatter = logging.Formatter("[%(asctime)s] - %(levelname)s - %(module)s : %(message)s")
     file_handler.setFormatter(formatter)
     file_handler.setLevel(log_level)
-    root_logger = logging.getLogger()
-    root_logger.addHandler(file_handler)
-    root_logger.setLevel(log_level)
+    # Stdout handler
     stdout_handler = logging.StreamHandler(stream=sys.stdout)
     stdout_handler.setFormatter(formatter)
     stdout_handler.setLevel(log_level)
+    root_logger = logging.getLogger()
+    root_logger.addHandler(file_handler)
+    root_logger.addHandler(stdout_handler)
+    root_logger.setLevel(log_level)
 
 
 if __name__ == '__main__':
