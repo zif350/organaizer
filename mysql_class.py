@@ -6,6 +6,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class MySQL:
+
     def __init__(self, database_name):
         LOGGER.info("Creating MySQL database")
         self.connection = mysql.connector.connect(

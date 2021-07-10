@@ -55,12 +55,12 @@ class User:
         self._password = val
 
     def __add_user_in_database(self):
-        values = (self._name, self._password, self._task_table)
-        LOGGER.debug(f"add user {self._name} in database")
+        values = (self.name, self.password, self._task_table)
+        LOGGER.debug(f"add user {self.name} in database")
         self._db.insert_data(table=User.TABLE_NAME, values=values)
 
     def select_some_task(self, condition="1=1"):
-        LOGGER.debug(f"user {self._name} select some from database")
+        LOGGER.debug(f"user {self.name} select task from database")
         return self._db.select_data(table=self._task_table, condition=condition)
 
     def turning_task_in_json(self, date):
@@ -69,7 +69,7 @@ class User:
         json_data = []
         for task in tasks:
             json_data.append(dict(zip(keys, task)))
-        LOGGER.debug(f"user {self._name} turning task in json: {json_data}")
+        LOGGER.debug(f"user {self.name} turning task in json: {json_data}")
         return json_data
 
     @classmethod
@@ -85,6 +85,6 @@ class User:
 
 
     def delete_user(self):
-        condition = f"name='{self._name}'"
+        condition = f"name='{self.name}'"
         self._db.drop_table(table_name=self._task_table)
         self._db.delete(table_name="users", condition=condition)

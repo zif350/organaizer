@@ -42,7 +42,7 @@ class MyWebServices:
 
     @cherrypy.expose()
     def user_daily_tasks(self, date=str(datetime.today()).split()[0]):
-        template = env.get_template('userDayliTasks.html')
+        template = env.get_template('userDailyTasks.html')
         tasks = cherrypy.session["person"].turning_task_in_json(date)
         cherrypy.session["date"] = date
         LOGGER.debug(f"user {cherrypy.session['person']._name} on date {date}")
@@ -132,7 +132,7 @@ def main():
             'tools.staticdir.dir': './public'
         }
     }
-    cherrypy.config.update({"server.socket_port": 8097})
+    cherrypy.config.update({"server.socket_port": 8098})
     LOGGER.debug("starting application")
     cherrypy.quickstart(MyWebServices(), '/', conf)
 
