@@ -2,8 +2,10 @@ import pytest
 import os
 import sys
 import requests
-from jinja2 import Environment, FileSystemLoader, select_autoescape
 from datetime import datetime
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+from threading import Thread
+import time
 
 
 sys.path.append(os.path.abspath('../'))
@@ -11,6 +13,7 @@ sys.path.append(os.path.abspath('../'))
 
 from user_class import User
 from task_class import Task
+from application import main
 
 
 env = Environment(
@@ -20,7 +23,16 @@ env = Environment(
 
 
 SESSION = requests.Session()
-URL = "http://127.0.0.1:8098/"
+URL = "http://127.0.0.1:8881/"
+
+
+def run_web():
+    main(template_loader_path="../template", static_dir="../public", port=8881)
+    os.system("python3 for_test_wem_app.py")
+
+run = Thread(target=run_web)
+run.start()
+time.sleep(5)
 
 
 @pytest.fixture()
@@ -83,8 +95,6 @@ def test_user_verification(user):
     response_sign_in = SESSION.post(url=URL+"user_verification",
                             data={"create": False, "name": user.name, "password": "12345Ll"})
     assert 200 == response_sign_in.status_code
-    # template_index = env.get_template("signIn.html")
-    # assert template_index.render(name=user.name, password="12345Ll", message="incorrect password or user name") == response_sign_in.text
     response_registration = SESSION.post(url=URL + "user_verification",
                             data={"create": True, "name": user.name, "password": user.password})
     assert 200 == response_registration.status_code
@@ -131,3 +141,4 @@ def test_sign_out(user):
     template = env.get_template("signIn.html")
     assert template.render() == response.text
     user.delete_user()
+

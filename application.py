@@ -12,10 +12,7 @@ import sys
 LOGGER = logging.getLogger(__name__)
 
 
-env = Environment(
-    loader=FileSystemLoader('./template'),
-    autoescape=select_autoescape(['html', 'xml'])
-)
+
 
 
 class MyWebServices:
@@ -120,7 +117,12 @@ class MyWebServices:
         raise cherrypy.HTTPRedirect("/updated_page")
 
 
-def main():
+def main(template_loader_path="./template", static_dir="./public", port=8098):
+    global env
+    env = Environment(
+        loader=FileSystemLoader(template_loader_path),
+        autoescape=select_autoescape(['html', 'xml'])
+    )
     LOGGER.debug("update cherrypy config")
     conf = {
         '/': {
@@ -129,10 +131,10 @@ def main():
         },
         '/static': {
             'tools.staticdir.on': True,
-            'tools.staticdir.dir': './public'
+            'tools.staticdir.dir': static_dir
         }
     }
-    cherrypy.config.update({"server.socket_port": 8098})
+    cherrypy.config.update({"server.socket_port": port})
     LOGGER.debug("starting application")
     cherrypy.quickstart(MyWebServices(), '/', conf)
 
