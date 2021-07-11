@@ -8,6 +8,7 @@ from task_class import Task
 import logging
 from logging.handlers import RotatingFileHandler
 import sys
+import argparse
 
 
 LOGGER = logging.getLogger(__name__)
@@ -137,9 +138,9 @@ def main(template_loader_path="./template", static_dir="./public", port=8098):
     cherrypy.quickstart(MyWebServices(), '/', conf)
 
 
-def setup_logging(log_level=logging.DEBUG):
+def setup_logging(log_level=logging.DEBUG, logfile_name="application.log"):
     # file handler
-    file_handler = logging.handlers.RotatingFileHandler(filename="application.log", maxBytes=2**30, backupCount=2)
+    file_handler = logging.handlers.RotatingFileHandler(filename=logfile_name, maxBytes=2**30, backupCount=2)
     formatter = logging.Formatter("[%(asctime)s] - %(levelname)s - %(module)s : %(message)s")
     file_handler.setFormatter(formatter)
     file_handler.setLevel(log_level)
@@ -153,9 +154,25 @@ def setup_logging(log_level=logging.DEBUG):
     root_logger.setLevel(log_level)
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="The programm start web application and logs all the process")
+    parser.version = "1.0"
+    parser.add_argument("-f", "--logfile-name", type=str,
+                        help="Name of the file where the log will be saved", default="application.log")
+    log_levels = [lvl for lvl in logging._nameToLevel.keys()]
+    parser.add_argument("-l", "--log-level", type=str, help=f"Log level. Supported: {', '.join(log_levels)}",
+                        default=logging.INFO)
+    parser.add_argument("-p", "--port", type=int, help="The number of the port on which the server will run",
+                        default=8881)
+    parser.add_argument("-v", "--version", action="version")
+    cli_args = parser.parse_args()
+    return cli_args
+
+
 if __name__ == '__main__':
-    setup_logging()
+    args = parse_args()
+    setup_logging(log_level=args.log_level, logfile_name=args.logfile_name)
     try:
-        main()
+        main(port=args.port)
     except Exception as ex:
         logging.critical(f"CRITICAL! Application failed, details: {ex}")

@@ -22,17 +22,21 @@ env = Environment(
 )
 
 
+PORT = 8882
+
+
 SESSION = requests.Session()
-URL = "http://127.0.0.1:8881/"
+URL = f"http://127.0.0.1:{PORT}/"
 
 
 def run_web():
-    main(template_loader_path="../template", static_dir="../public", port=8881)
+    main(template_loader_path="../template", static_dir="../public", port=PORT)
     os.system("python3 for_test_wem_app.py")
+
 
 run = Thread(target=run_web)
 run.start()
-time.sleep(5)
+time.sleep(2)
 
 
 @pytest.fixture()
