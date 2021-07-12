@@ -48,12 +48,14 @@
                 xhr.send(formData);
                 e.target.classList.toggle("checked")
             } else if (e.target.parentElement.tagName == "LI") {
-                let formData = new FormData(document.forms.person);
-                formData.append("task_id", e.target.parentElement.id);
-                let xhr = new XMLHttpRequest();
-                xhr.open("POST", "/update_task");
-                xhr.send(formData);
-                e.target.parentElement.classList.toggle("checked")
+                if (e.target.tagName == "SPAN") {
+                    let formData = new FormData(document.forms.person);
+                    formData.append("task_id", e.target.parentElement.id);
+                    let xhr = new XMLHttpRequest();
+                    xhr.open("POST", "/update_task");
+                    xhr.send(formData);
+                    e.target.parentElement.classList.toggle("checked")
+                }
             }
 
         })
